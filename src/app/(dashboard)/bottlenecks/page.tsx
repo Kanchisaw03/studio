@@ -1,5 +1,5 @@
-import { CrowdDensityChart } from "./components/crowd-density-chart";
-import { DispatchStatsChart } from "./components/dispatch-stats-chart";
+import { CrowdDensityChart } from "../components/crowd-density-chart";
+import { DispatchStatsChart } from "../components/dispatch-stats-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, TrafficCone } from "lucide-react";
 
