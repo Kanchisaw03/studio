@@ -26,7 +26,9 @@ const SummarizeEventsOutputSchema = z.object({
 export type SummarizeEventsOutput = z.infer<typeof SummarizeEventsOutputSchema>;
 
 export async function summarizeEvents(input: SummarizeEventsInput) {
-  const {stream} = await summarizeEventsStreamFlow(input);
+  const { stream, response } = summarizeEventsStreamFlow(input);
+  // The response promise must be awaited for the flow to complete.
+  response.catch(e => console.error(e));
   return stream;
 }
 
@@ -44,18 +46,12 @@ const summarizeEventsStreamFlow = ai.defineFlow(
       stream: true,
     });
     
-    const outputStream = new ReadableStream({
-      async start(controller) {
-        for await (const chunk of stream) {
-            const text = chunk.text;
-            if (text) {
-                controller.enqueue(text);
-            }
-        }
-        controller.close();
-      },
-    });
-
-    return { stream: outputStream };
+    return stream.pipeThrough(
+      new TransformStream<any, string>({
+        transform(chunk, controller) {
+          controller.enqueue(chunk.text);
+        },
+      })
+    );
   }
 );
