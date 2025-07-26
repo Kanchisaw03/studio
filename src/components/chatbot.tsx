@@ -10,15 +10,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { chat } from '@/ai/flows/chat';
 import { Skeleton } from './ui/skeleton';
+import type { ChatMessage } from '@/types';
 
-type Message = {
-  role: 'user' | 'model';
-  content: string;
-};
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -34,7 +31,7 @@ export function Chatbot() {
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const userMessage: Message = { role: 'user', content: input };
+    const userMessage: ChatMessage = { role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setLoading(true);
@@ -46,10 +43,10 @@ export function Chatbot() {
       }));
 
       const { response } = await chat({ history: chatHistory, message: input });
-      const botMessage: Message = { role: 'model', content: response };
+      const botMessage: ChatMessage = { role: 'model', content: response };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-      const errorMessage: Message = { role: 'model', content: 'Sorry, something went wrong.' };
+      const errorMessage: ChatMessage = { role: 'model', content: 'Sorry, something went wrong.' };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setLoading(false);
