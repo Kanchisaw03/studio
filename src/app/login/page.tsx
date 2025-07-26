@@ -27,15 +27,15 @@ export default function LoginPage() {
           <CardTitle className="text-2xl font-headline">Drishti Command Center</CardTitle>
           <CardDescription>Commander Access Portal</CardDescription>
         </CardHeader>
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleLogin} data-form-type="password">
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="commander@drishti.gov" required defaultValue="commander@drishti.gov" />
+              <Input id="email" type="email" placeholder="commander@drishti.gov" required defaultValue="commander@drishti.gov" autoComplete="off" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required defaultValue="Kanchi@0003" />
+              <Input id="password" type="password" required defaultValue="Kanchi@0003" autoComplete="off" />
             </div>
           </CardContent>
           <CardFooter>
