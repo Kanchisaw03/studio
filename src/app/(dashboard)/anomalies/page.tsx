@@ -1,4 +1,4 @@
-import { AnomalyTable } from './components/anomaly-table';
+import { AnomalyTable } from '@/app/(dashboard)/components/anomaly-table';
 
 export default function AnomaliesPage() {
   return (
