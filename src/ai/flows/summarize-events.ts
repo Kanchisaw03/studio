@@ -33,7 +33,7 @@ const summarizeEventsPrompt = ai.definePrompt({
   name: 'summarizeEventsPrompt',
   input: {schema: SummarizeEventsInputSchema},
   output: {schema: SummarizeEventsOutputSchema},
-  prompt: `You are an AI assistant helping a commander understand the current situation. Summarize the following recent events in a concise and informative way:\n\n{% each events %}\n- Type: {{type}}, Severity: {{severity}}, Zone: {{zone}}, Timestamp: {{timestamp}}\n{% endeach %}\n\nSummary: `,
+  prompt: `You are an AI assistant helping a commander understand the current situation. Summarize the following recent events in a concise and informative way:\n\n{{#each events}}\n- Type: {{type}}, Severity: {{severity}}, Zone: {{zone}}, Timestamp: {{timestamp}}\n{{/each}}\n\nSummary: `,
 });
 
 const summarizeEventsFlow = ai.defineFlow(
