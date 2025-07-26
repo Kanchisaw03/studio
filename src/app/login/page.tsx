@@ -35,7 +35,7 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required defaultValue="password" />
+              <Input id="password" type="password" required defaultValue="Kanchi@0003" />
             </div>
           </CardContent>
           <CardFooter>
