@@ -16,8 +16,6 @@ export function SummaryLog() {
     setLoading(true);
     setSummary('');
     try {
-      // Use mock data to feed the summarizer
-      // In a real app, this would come from a real-time data source
       const recentEvents = getAnomalies(5).map(e => ({
         id: e.id,
         type: e.type,
@@ -26,8 +24,17 @@ export function SummaryLog() {
         timestamp: e.timestamp,
       }));
       
-      const result = await summarizeEvents({ events: recentEvents });
-      setSummary(result.summary);
+      const stream = await summarizeEvents({ events: recentEvents });
+      const reader = stream.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        setSummary(currentSummary => currentSummary + chunk);
+      }
+
     } catch (error) {
       console.error('Error generating summary:', error);
       setSummary('Failed to generate summary. Please try again.');
@@ -43,12 +50,12 @@ export function SummaryLog() {
       actions={
         <Button variant="ghost" size="sm" onClick={handleGenerateSummary} disabled={loading}>
           <Wand2 className="mr-2 h-4 w-4" />
-          Generate Summary
+          {loading ? 'Generating...' : 'Generate Summary'}
         </Button>
       }
     >
       <div className="pt-2 text-sm text-muted-foreground min-h-[60px]">
-        {loading ? (
+        {loading && !summary ? (
           <div className="space-y-2">
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-full" />

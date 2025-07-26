@@ -25,25 +25,37 @@ const SummarizeEventsOutputSchema = z.object({
 
 export type SummarizeEventsOutput = z.infer<typeof SummarizeEventsOutputSchema>;
 
-export async function summarizeEvents(input: SummarizeEventsInput): Promise<SummarizeEventsOutput> {
-  return summarizeEventsFlow(input);
+export async function summarizeEvents(input: SummarizeEventsInput) {
+  const {stream} = await summarizeEventsStreamFlow(input);
+  return stream;
 }
 
-const summarizeEventsPrompt = ai.definePrompt({
-  name: 'summarizeEventsPrompt',
-  input: {schema: SummarizeEventsInputSchema},
-  output: {schema: SummarizeEventsOutputSchema},
-  prompt: `You are an AI assistant helping a commander understand the current situation. Summarize the following recent events in a concise and informative way:\n\n{{#each events}}\n- Type: {{type}}, Severity: {{severity}}, Zone: {{zone}}, Timestamp: {{timestamp}}\n{{/each}}\n\nSummary: `,
-});
-
-const summarizeEventsFlow = ai.defineFlow(
+const summarizeEventsStreamFlow = ai.defineFlow(
   {
-    name: 'summarizeEventsFlow',
+    name: 'summarizeEventsStreamFlow',
     inputSchema: SummarizeEventsInputSchema,
-    outputSchema: SummarizeEventsOutputSchema,
+    outputSchema: z.string().stream(),
   },
-  async input => {
-    const {output} = await summarizeEventsPrompt(input);
-    return output!;
+  async (input) => {
+    const {stream} = await ai.generate({
+      prompt: `You are an AI assistant helping a commander understand the current situation. Summarize the following recent events in a concise and informative way:\n\n{{#each events}}\n- Type: {{type}}, Severity: {{severity}}, Zone: {{zone}}, Timestamp: {{timestamp}}\n{{/each}}\n\nSummary: `,
+      input: { events: input.events },
+      model: 'googleai/gemini-2.0-flash',
+      stream: true,
+    });
+    
+    const outputStream = new ReadableStream({
+      async start(controller) {
+        for await (const chunk of stream) {
+            const text = chunk.text;
+            if (text) {
+                controller.enqueue(text);
+            }
+        }
+        controller.close();
+      },
+    });
+
+    return { stream: outputStream };
   }
 );

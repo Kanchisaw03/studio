@@ -25,6 +25,13 @@ export default function SummariesPage() {
 
   const handleGenerateSummary = async () => {
     setLoading(true);
+    const newSummary: Summary = {
+      timestamp: new Date().toISOString(),
+      content: '',
+    };
+    // Pre-emptively add the new summary card to the top
+    setSummaries(prev => [newSummary, ...prev]);
+
     try {
       const recentEvents = getAnomalies(5).map(e => ({
         id: e.id,
@@ -34,15 +41,29 @@ export default function SummariesPage() {
         timestamp: e.timestamp,
       }));
       
-      const result = await summarizeEvents({ events: recentEvents });
-      const newSummary: Summary = {
-        timestamp: new Date().toISOString(),
-        content: result.summary,
-      };
-      setSummaries(prev => [newSummary, ...prev]);
+      const stream = await summarizeEvents({ events: recentEvents });
+      const reader = stream.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        setSummaries(prev => {
+            const updatedSummaries = [...prev];
+            // Update the content of the first summary (the one we just added)
+            updatedSummaries[0].content += chunk;
+            return updatedSummaries;
+        });
+      }
+
     } catch (error) {
       console.error('Error generating summary:', error);
-      // You could use a toast notification here to show the error
+       setSummaries(prev => {
+            const updatedSummaries = [...prev];
+            updatedSummaries[0].content = 'Failed to generate summary. Please try again.';
+            return updatedSummaries;
+        });
     } finally {
       setLoading(false);
     }
@@ -86,7 +107,15 @@ export default function SummariesPage() {
               </p>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">{summary.content}</p>
+              {loading && index === 0 && !summary.content ? (
+                <div className="space-y-2 pt-2 text-muted-foreground">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                </div>
+              ) : (
+                <p className="text-muted-foreground">{summary.content}</p>
+              )}
             </CardContent>
           </Card>
         ))}
