@@ -5,7 +5,7 @@ import {ai} from '@/ai/genkit';
 import { getAnomalies, getInitialAlerts } from '@/services/mock-data';
 import {z} from 'genkit';
 
-export const ChatInputSchema = z.object({
+const ChatInputSchema = z.object({
   history: z.array(z.object({
     role: z.enum(['user', 'model']),
     content: z.string(),
@@ -13,7 +13,7 @@ export const ChatInputSchema = z.object({
   message: z.string(),
 });
 
-export const ChatOutputSchema = z.object({
+const ChatOutputSchema = z.object({
   response: z.string(),
 });
 
