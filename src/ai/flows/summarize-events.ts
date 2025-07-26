@@ -36,11 +36,19 @@ const summarizeEventsStreamFlow = ai.defineFlow(
   {
     name: 'summarizeEventsStreamFlow',
     inputSchema: SummarizeEventsInputSchema,
-    outputSchema: z.string().stream(),
+    // The output schema for a streaming flow is the type of the final, complete object, not the chunks.
+    outputSchema: z.string(),
+    stream: true,
   },
   async (input) => {
     const {stream} = await ai.generate({
-      prompt: `You are an AI assistant helping a commander understand the current situation. Summarize the following recent events in a concise and informative way:\n\n{{#each events}}\n- Type: {{type}}, Severity: {{severity}}, Zone: {{zone}}, Timestamp: {{timestamp}}\n{{/each}}\n\nSummary: `,
+      prompt: `You are an AI assistant helping a commander understand the current situation. Summarize the following recent events in a concise and informative way:
+
+{{#each events}}
+- Type: {{type}}, Severity: {{severity}}, Zone: {{zone}}, Timestamp: {{timestamp}}
+{{/each}}
+
+Summary:`,
       input: { events: input.events },
       model: 'googleai/gemini-2.0-flash',
       stream: true,
