@@ -31,15 +31,15 @@ export default function LoginPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="commander@drishti.gov" required defaultValue="commander@drishti.gov" autoComplete="off" />
+              <Input id="email" type="email" placeholder="commander@drishti.gov" required defaultValue="commander@drishti.gov" autoComplete="off" suppressHydrationWarning />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required defaultValue="Kanchi@0003" autoComplete="off" />
+              <Input id="password" type="password" required defaultValue="Kanchi@0003" autoComplete="off" suppressHydrationWarning />
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" suppressHydrationWarning>
               Authenticate & Enter
             </Button>
           </CardFooter>
